@@ -1,0 +1,19 @@
+{
+	"name": "@openlawnz/openlawnz-api",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"license": "GPL-3.0",
+	"dependencies": {
+		"@graphile-contrib/pg-simplify-inflector": "^6.0.0",
+		"@graphile/pro": "^0.10.0",
+		"aws-serverless-express": "^3.3.8",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
+		"graphile-utils": "^4.8.0",
+		"pg": "^8.3.3",
+		"postgraphile": "^4.8.0"
+	}
+}
