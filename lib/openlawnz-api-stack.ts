@@ -16,7 +16,7 @@ if (
   !process.env.SECURITY_GROUP_IDS ||
   !process.env.VPC_ID ||
   !process.env.SECRET_ARN ||
-  !process.env.POSTGRAPHILE_CACHE_FILE_S3 ||
+  !process.env.ENVIRONMENT ||
   !process.env.HOSTED_ZONE_DOMAIN_NAME ||
   !process.env.DEPLOYMENT_MAP
 ) {
@@ -27,8 +27,7 @@ const SECRET_ARN: string = process.env.SECRET_ARN;
 const CERTIFICATE_ARN: string = process.env.CERTIFICATE_ARN;
 const VPC_ID: string = process.env.VPC_ID;
 const SECURITY_GROUP_IDS: string[] = process.env.SECURITY_GROUP_IDS.split(",");
-const POSTGRAPHILE_CACHE_FILE_S3 = process.env.POSTGRAPHILE_CACHE_FILE_S3;
-const ENVIRONMENT: string = process.env.CODEBUILD_SOURCE_VERSION!
+const ENVIRONMENT: string = process.env.ENVIRONMENT!
 const HOSTED_ZONE_DOMAIN_NAME: string = process.env.HOSTED_ZONE_DOMAIN_NAME!
 const DEPLOYMENT_MAP: {
   [index: string]: {
