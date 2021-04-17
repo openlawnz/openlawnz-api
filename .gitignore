@@ -1,4 +1,3 @@
-*.js
 !jest.config.js
 *.d.ts
 
@@ -382,7 +381,6 @@ $RECYCLE.BIN/
 ### CDK-specific ignores ###
 *.swp
 cdk.context.json
-package-lock.json
 yarn.lock
 .cdk.staging
 cdk.out
