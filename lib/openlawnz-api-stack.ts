@@ -7,7 +7,7 @@ import * as targets from '@aws-cdk/aws-route53-targets';
 import { SecurityGroup, Vpc } from "@aws-cdk/aws-ec2";
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { HostedZone } from '@aws-cdk/aws-route53';
-import 'path';
+const path = require("path")
 
 require('dotenv').config()
 
