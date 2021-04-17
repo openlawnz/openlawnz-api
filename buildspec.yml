@@ -7,5 +7,5 @@ phases:
       - npm install
   build:
     commands:
-      - cdk synth
+      - cdk synth --verbose
       - cdk deploy
