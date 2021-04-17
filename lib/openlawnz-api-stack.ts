@@ -92,7 +92,7 @@ export class OpenlawnzApiStack extends cdk.Stack {
         commandHooks: {
           // Copy a file so that it will be included in the bundled asset
           afterBundling(inputDir: string, outputDir: string): string[] {
-            return [`aws s3 cp s3://${POSTGRAPHILE_CACHE_FILE_S3} ${path.join(__dirname, outputDir)}`];
+            return [`cp ${__dirname}/../src/postgraphile.cache ${outputDir}`];
           },
           // CDK Typescript failing if these not present
           beforeBundling(): string[] {
