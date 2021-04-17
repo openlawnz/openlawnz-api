@@ -8,6 +8,6 @@ phases:
   build:
     commands:
       - cdk synth --verbose --output=dist
-  artifacts:
-    files: 
-      - dist/*
+artifacts:
+  files: 
+    - dist/*
