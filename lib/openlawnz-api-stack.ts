@@ -7,6 +7,7 @@ import * as targets from '@aws-cdk/aws-route53-targets';
 import { SecurityGroup, Vpc } from "@aws-cdk/aws-ec2";
 import * as acm from '@aws-cdk/aws-certificatemanager';
 import { HostedZone } from '@aws-cdk/aws-route53';
+import 'path';
 
 require('dotenv').config()
 
@@ -91,7 +92,7 @@ export class OpenlawnzApiStack extends cdk.Stack {
         commandHooks: {
           // Copy a file so that it will be included in the bundled asset
           afterBundling(inputDir: string, outputDir: string): string[] {
-            return [`aws s3 cp s3://${POSTGRAPHILE_CACHE_FILE_S3} ${outputDir}`];
+            return [`aws s3 cp s3://${POSTGRAPHILE_CACHE_FILE_S3} ${path.join(__dirname, outputDir)}`];
           },
           // CDK Typescript failing if these not present
           beforeBundling(): string[] {
