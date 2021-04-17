@@ -9,7 +9,7 @@ phases:
     commands:
       - cdk synth --verbose --output=dist
 artifacts:
-  base-directory: dist
-  files: 
+  files:
     - **/*
+  base-directory: dist
   name: openlawnz-api
