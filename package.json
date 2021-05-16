@@ -1,19 +1,32 @@
 {
-	"name": "@openlawnz/openlawnz-api",
-	"version": "1.0.0",
-	"main": "index.js",
-	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
-	"license": "GPL-3.0",
-	"dependencies": {
-		"@graphile-contrib/pg-simplify-inflector": "^6.0.0",
-		"@graphile/pro": "^0.10.0",
-		"aws-serverless-express": "^3.3.8",
-		"cors": "^2.8.5",
-		"express": "^4.17.1",
-		"graphile-utils": "^4.8.0",
-		"pg": "^8.3.3",
-		"postgraphile": "^4.8.0"
-	}
+  "name": "@openlawnz/openlawnz-api",
+  "version": "0.1.0",
+  "bin": {
+    "openlawnz-api": "bin/openlawnz-api.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^15.3.0",
+    "aws-cdk": "^1.104.0",
+    "esbuild": "^0.11.22",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-apigateway": "^1.104.0",
+    "@aws-cdk/aws-certificatemanager": "^1.104.0",
+    "@aws-cdk/aws-ec2": "^1.104.0",
+    "@aws-cdk/aws-lambda-nodejs": "^1.104.0",
+    "@aws-cdk/aws-route53": "^1.104.0",
+    "@aws-cdk/aws-route53-targets": "^1.104.0",
+    "@aws-cdk/aws-secretsmanager": "^1.104.0",
+    "@aws-cdk/core": "^1.104.0",
+    "dotenv": "^9.0.2",
+    "source-map-support": "^0.5.16"
+  }
 }
