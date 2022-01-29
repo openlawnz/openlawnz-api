@@ -1,4 +1,3 @@
-var cors = require('cors')
 const awsServerlessExpress = require('aws-serverless-express')
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
 const express = require('express')
@@ -18,11 +17,6 @@ const pool = new Pool({
 	user: process.env.DB_USER,
 	password: process.env.DB_PASSWORD
 });
-
-app.use(cors({
-	origin: 'https://www.openlaw.nz',
-	optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs)
-}));
 
 app.use(awsServerlessExpressMiddleware.eventContext());
 
@@ -51,7 +45,6 @@ app.use(postgraphile(
 	simpleCollections: 'only',
 	disableDefaultMutations: true,
 	ignoreRBAC: false,
-	readCache: `${__dirname}/postgraphile.cache`,
 }
 ));
 
