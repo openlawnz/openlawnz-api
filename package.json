@@ -11,11 +11,6 @@
   },
   "private": true,
   "devDependencies": {
-    "@types/node": "^16.6.1",
-    "aws-cdk": "1.118.0",
-    "esbuild": "^0.12.20",
-    "ts-node": "^10.2.0",
-    "typescript": "4.3.5",
     "@aws-cdk/aws-apigateway": "^1.118.0",
     "@aws-cdk/aws-certificatemanager": "^1.118.0",
     "@aws-cdk/aws-ec2": "^1.118.0",
@@ -23,17 +18,22 @@
     "@aws-cdk/aws-route53": "^1.118.0",
     "@aws-cdk/aws-route53-targets": "^1.118.0",
     "@aws-cdk/aws-secretsmanager": "^1.118.0",
-    "@aws-cdk/core": "1.118.0",
-    "dotenv": "^10.0.0",
-    "source-map-support": "^0.5.16"
+    "@aws-cdk/core": "^1.142.0",
+    "@types/node": "^16.11.39",
+    "aws-cdk": "^1.159.0",
+    "dotenv": "^14.3.2",
+    "esbuild": "^0.14.14",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.5"
   },
   "dependencies": {
     "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
     "@graphile/pro": "^1.0.3",
     "aws-serverless-express": "^3.4.0",
-    "express": "^4.17.1",
-    "graphile-utils": "^4.12.1",
+    "express": "^4.17.2",
+    "graphile-utils": "^4.12.2",
     "pg": "^8.7.1",
-    "postgraphile": "^4.12.3"
+    "postgraphile": "^4.12.8"
   }
 }
