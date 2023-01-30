@@ -34,6 +34,6 @@
     "express": "^4.17.2",
     "graphile-utils": "^4.12.2",
     "pg": "^8.7.1",
-    "postgraphile": "^4.12.8"
+    "postgraphile": "^4.13.0"
   }
 }
