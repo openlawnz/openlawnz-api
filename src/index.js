@@ -1,21 +1,42 @@
-const awsServerlessExpress = require('aws-serverless-express')
-const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware')
-const express = require('express')
-const { Pool } = require('pg')
-const { postgraphile, makePluginHook } = require("postgraphile");
-const PgSimplifyInflectorPlugin = require('@graphile-contrib/pg-simplify-inflector');
-const pluginHook = makePluginHook([require("@graphile/pro").default]);
+import awsServerlessExpress from 'aws-serverless-express';
+import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware';
+import express from 'express';
+import { Pool }  from 'pg';
+import { postgraphile, makePluginHook } from "postgraphile";
+import PgSimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
+import graphilePro from '@graphile/pro';
+import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
+
+const pluginHook = makePluginHook([graphilePro]);
+
+const client = new SecretsManagerClient({ region: "ap-southeast-2" });
+
+const command = new GetSecretValueCommand({
+	SecretId: process.env.SECRET_ARN
+});
+const response = await client.send(command);
+
+if(!response.SecretString) {
+	process.exit();
+}
+const secretJSON = JSON.parse(response.SecretString);
+
+const DB_HOST = secretJSON["DB_HOST"];
+const DB_PORT = secretJSON["PORT"];
+const DB_USER = secretJSON["DB_USER"];
+const DB_PASSWORD = secretJSON["DB_PASSWORD"];
+const GRAPHILE_LICENSE = secretJSON["GRAPHILE_LICENSE"];
 
 const app = express();
 
 const stage = process.env.STAGE;
 
 const pool = new Pool({
-	host: process.env.DB_HOST,
-	port: process.env.DB_PORT,
+	host: DB_HOST,
+	port: DB_PORT,
 	database: stage,
-	user: process.env.DB_USER,
-	password: process.env.DB_PASSWORD
+	user: DB_USER,
+	password: DB_PASSWORD
 });
 
 app.use(awsServerlessExpressMiddleware.eventContext());
@@ -23,7 +44,7 @@ app.use(awsServerlessExpressMiddleware.eventContext());
 app.use(postgraphile(
 	pool,
 	'main', {
-	license: process.env.GRAPHILE_LICENSE,
+	license: GRAPHILE_LICENSE,
 	pluginHook,
 	enableCors: true,
 	graphiql: true,
@@ -50,6 +71,6 @@ app.use(postgraphile(
 
 const server = awsServerlessExpress.createServer(app);
 
-exports.handler = (event, context) => {
+export const handler = async (event, context) => {
 	awsServerlessExpress.proxy(server, event, context);
 };
