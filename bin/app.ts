@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
-import * as cdk from '@aws-cdk/core';
-import { OpenlawnzApiStack } from '../lib/openlawnz-api-stack';
+import * as cdk from 'aws-cdk-lib';
+import { AppStack } from '../lib/app-stack';
 
 require('dotenv').config()
 
@@ -32,7 +32,7 @@ const environmentToDeploy = toDeploy.environment;
 
 const app = new cdk.App();
 
-new OpenlawnzApiStack(app, 'OpenlawnzApiStack' + environmentToDeploy, {
+new AppStack(app, 'OpenlawnzApiStack' + environmentToDeploy, {
 	env: {
 		account: process.env.CDK_DEFAULT_ACCOUNT,
 		region: process.env.CDK_DEFAULT_REGION

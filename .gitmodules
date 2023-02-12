@@ -1,0 +1,3 @@
+[submodule "openlawnz-db"]
+	path = openlawnz-db
+	url = https://github.com/openlawnz/openlawnz-db.git

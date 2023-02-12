@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "aws-sam",
+            "request": "direct-invoke",
+            "name": "openlawnz-api:src/index.handler (nodejs18.x)",
+            "invokeTarget": {
+                "target": "code",
+                "projectRoot": "${workspaceFolder}/",
+                "lambdaHandler": "src/index.handler"
+            },
+            "lambda": {
+                "runtime": "nodejs18.x",
+                "payload": {},
+                "environmentVariables": {
+                    "STAGE": "dev",
+                    "SECRET_ARN": ""
+                }
+            }
+        }
+    ]
+}
