@@ -1,0 +1,30 @@
+name: OpenLaw NZ API
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_DEFAULT_REGION: ${{secrets.AWS_DEFAULT_REGION}}
+      AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      CERTIFICATE_ARN: ${{secrets.CERTIFICATE_ARN}}
+      DEPLOYMENT_MAP: ${{secrets.DEPLOYMENT_MAP}}
+      HOSTED_ZONE_DOMAIN_NAME: ${{secrets.HOSTED_ZONE_DOMAIN_NAME}}
+      LAYER_ARN: ${{secrets.LAYER_ARN}}
+      SECRET_ARN: ${{secrets.SECRET_ARN}}
+      SECURITY_GROUP_IDS: ${{secrets.SECURITY_GROUP_IDS}}
+      VPC_ID: ${{secrets.VPC_ID}}
+      DEPLOYMENT_KEY: "development"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm install -g aws-cdk esbuild
+      - run: cdk synth && cdk deploy
