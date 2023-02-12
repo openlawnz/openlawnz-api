@@ -27,4 +27,4 @@ jobs:
           node-version: 18
       - run: npm install
       - run: npm install -g aws-cdk esbuild
-      - run: cdk synth && cdk deploy
+      - run: cdk synth && cdk deploy --require-approval never
