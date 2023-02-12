@@ -1,76 +1,74 @@
-import awsServerlessExpress from 'aws-serverless-express';
-import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware';
-import express from 'express';
-import { Pool }  from 'pg';
-import { postgraphile, makePluginHook } from "postgraphile";
-import PgSimplifyInflectorPlugin from '@graphile-contrib/pg-simplify-inflector';
-import graphilePro from '@graphile/pro';
-import { SecretsManagerClient, GetSecretValueCommand } from "@aws-sdk/client-secrets-manager";
-
-const pluginHook = makePluginHook([graphilePro]);
-
-const client = new SecretsManagerClient({ region: "ap-southeast-2" });
-
-const command = new GetSecretValueCommand({
-	SecretId: process.env.SECRET_ARN
-});
-const response = await client.send(command);
-
-if(!response.SecretString) {
-	process.exit();
-}
-const secretJSON = JSON.parse(response.SecretString);
-
-const DB_HOST = secretJSON["DB_HOST"];
-const DB_PORT = secretJSON["PORT"];
-const DB_USER = secretJSON["DB_USER"];
-const DB_PASSWORD = secretJSON["DB_PASSWORD"];
-const GRAPHILE_LICENSE = secretJSON["GRAPHILE_LICENSE"];
-
+const serverlessExpress = require('@vendia/serverless-express')
+const awsServerlessExpressMiddleware = require('@vendia/serverless-express/src/middleware')
+const express = require('express')
+const { Pool } = require('pg')
+const { postgraphile, makePluginHook } = require("postgraphile");
+const PgSimplifyInflectorPlugin = require('@graphile-contrib/pg-simplify-inflector');
+const pluginHook = makePluginHook([require("@graphile/pro").default]);
+const stage = process.env.STAGE;
 const app = express();
 
-const stage = process.env.STAGE;
+let serverlessExpressInstance
 
-const pool = new Pool({
-	host: DB_HOST,
-	port: DB_PORT,
-	database: stage,
-	user: DB_USER,
-	password: DB_PASSWORD
-});
+async function setup(event, context) {
+	const response = await fetch(`http://localhost:2773/secretsmanager/get?secretId=${process.env.SECRET_ARN}`, {
+		headers: {
+			"X-Aws-Parameters-Secrets-Token": process.env.AWS_SESSION_TOKEN
+		},
+    });
+    const secretJSON = JSON.parse((await response.json()).SecretString);
+	
+	const DB_HOST = secretJSON["DB_HOST"];
+	const DB_PORT = secretJSON["PORT"];
+	const DB_USER = secretJSON["DB_USER"];
+	const DB_PASSWORD = secretJSON["DB_PASSWORD"];
+	const GRAPHILE_LICENSE = secretJSON["GRAPHILE_LICENSE"];
+	
+	const pool = new Pool({
+		host: DB_HOST,
+		port: DB_PORT,
+		database: stage,
+		user: DB_USER,
+		password: DB_PASSWORD
+	});
 
-app.use(awsServerlessExpressMiddleware.eventContext());
+	app.use(awsServerlessExpressMiddleware.eventContext());
 
-app.use(postgraphile(
-	pool,
-	'main', {
-	license: GRAPHILE_LICENSE,
-	pluginHook,
-	enableCors: true,
-	graphiql: true,
-	enhanceGraphiql: true,
-	graphqlRoute: '/graphql',
-	//readOnlyConnection: true,
-	defaultPaginationCap: -1,
-	graphqlDepthLimit: 50000,
-	graphqlCostLimit: 50000,
-	exposeGraphQLCost: false,
-	appendPlugins: [
-		PgSimplifyInflectorPlugin,
-	],
-	//core
-	graphileBuildOptions: {
-		pgOmitListSuffix: true,
-	},
-	watchPg: false,
-	simpleCollections: 'only',
-	disableDefaultMutations: true,
-	ignoreRBAC: false,
+	app.use(postgraphile(
+		pool,
+		'main', {
+		license: GRAPHILE_LICENSE,
+		pluginHook,
+		enableCors: true,
+		graphiql: stage === "dev",
+		enhanceGraphiql: true,
+		graphqlRoute: '/graphql',
+		//readOnlyConnection: true,
+		defaultPaginationCap: -1,
+		graphqlDepthLimit: 50000,
+		graphqlCostLimit: 50000,
+		exposeGraphQLCost: false,
+		appendPlugins: [
+			PgSimplifyInflectorPlugin,
+		],
+		//core
+		graphileBuildOptions: {
+			pgOmitListSuffix: true,
+		},
+		watchPg: false,
+		simpleCollections: 'only',
+		disableDefaultMutations: true,
+		ignoreRBAC: false,
+	}
+	));
+
+	serverlessExpressInstance = serverlessExpress({ app })
+	return serverlessExpressInstance(event, context)
 }
-));
 
-const server = awsServerlessExpress.createServer(app);
+function handler(event, context) {
+	if (serverlessExpressInstance) return serverlessExpressInstance(event, context)
+	return setup(event, context)
+}
 
-export const handler = async (event, context) => {
-	awsServerlessExpress.proxy(server, event, context);
-};
+exports.handler = handler

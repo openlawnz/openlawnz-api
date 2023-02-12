@@ -2,12 +2,12 @@ import * as cdk from 'aws-cdk-lib';
 import { Cors, EndpointType, LambdaRestApi, SecurityPolicy } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { SecurityGroup, Vpc } from 'aws-cdk-lib/aws-ec2';
-import { NodejsFunction, OutputFormat } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
-import { Runtime } from 'aws-cdk-lib/aws-lambda';
-
+import { LayerVersion, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Effect, Policy, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 require('dotenv').config()
 
 if (
@@ -15,6 +15,7 @@ if (
   !process.env.SECURITY_GROUP_IDS ||
   !process.env.VPC_ID ||
   !process.env.SECRET_ARN ||
+  !process.env.LAYER_ARN ||
   !process.env.DEPLOYMENT_KEY ||
   !process.env.HOSTED_ZONE_DOMAIN_NAME ||
   !process.env.DEPLOYMENT_MAP
@@ -23,6 +24,7 @@ if (
 }
 
 const SECRET_ARN: string = process.env.SECRET_ARN;
+const LAYER_ARN: string = process.env.LAYER_ARN;
 const CERTIFICATE_ARN: string = process.env.CERTIFICATE_ARN;
 const VPC_ID: string = process.env.VPC_ID;
 const SECURITY_GROUP_IDS: string[] = process.env.SECURITY_GROUP_IDS.split(",");
@@ -52,6 +54,8 @@ export class AppStack extends cdk.Stack {
     id = id + environmentToDeploy
 
     const vpc = Vpc.fromLookup(this, VPC_ID, { isDefault: true })
+    
+    const layer = LayerVersion.fromLayerVersionArn(this, "cdklayer", LAYER_ARN)
 
     const APILambda = new NodejsFunction(this, `APIHandler${environmentToDeploy}`, {
       entry: 'src/index.js',
@@ -70,20 +74,42 @@ export class AppStack extends cdk.Stack {
           '@graphile-contrib/pg-simplify-inflector',
           '@graphile/pro',
           '@aws-sdk/client-secrets-manager',
-          'aws-serverless-express',
           'graphile-utils',
           'pg',
           'postgraphile'
         ],
-        externalModules: ['pg-native'],
-        format: OutputFormat.ESM,
-        mainFields: ["module", "main"],
-        esbuildArgs: {
-          "--conditions": "module",
-        }
+        externalModules: ['pg-native']
       },
-      handler: 'handler'
+      handler: 'handler',
+      layers: [layer]
     });
+
+    // https://docs.aws.amazon.com/mediaconnect/latest/ug/iam-policy-examples-asm-secrets.html#iam-policy-examples-asm-specific-secrets
+
+    const secretsManagerPolicy = new PolicyStatement({
+      actions: [
+        "secretsmanager:GetResourcePolicy",
+        "secretsmanager:GetSecretValue",
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:ListSecretVersionIds"
+      ],
+      effect: Effect.ALLOW,
+      resources: [process.env.SECRET_ARN as string],
+    });
+
+    const secretsManagerPolicyList = new PolicyStatement({
+      actions: [
+        "secretsmanager:ListSecrets"
+      ],
+      effect: Effect.ALLOW,
+      resources: ["*"],
+    });
+
+    APILambda.role?.attachInlinePolicy(
+      new Policy(this, 'secrets-manager-policy', {
+        statements: [secretsManagerPolicy, secretsManagerPolicyList],
+      }),
+    );
 
     const certificate = Certificate.fromCertificateArn(this, 'Certificate', CERTIFICATE_ARN);
 
