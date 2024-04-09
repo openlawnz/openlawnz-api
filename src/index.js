@@ -11,18 +11,12 @@ const app = express();
 let serverlessExpressInstance
 
 async function setup(event, context) {
-	const response = await fetch(`http://localhost:2773/secretsmanager/get?secretId=${process.env.SECRET_ARN}`, {
-		headers: {
-			"X-Aws-Parameters-Secrets-Token": process.env.AWS_SESSION_TOKEN
-		},
-    });
-    const secretJSON = JSON.parse((await response.json()).SecretString);
 	
-	const DB_HOST = secretJSON["DB_HOST"];
-	const DB_PORT = secretJSON["PORT"];
-	const DB_USER = secretJSON["DB_USER"];
-	const DB_PASSWORD = secretJSON["DB_PASSWORD"];
-	const GRAPHILE_LICENSE = secretJSON["GRAPHILE_LICENSE"];
+	const DB_HOST = process.env.DB_HOST;
+	const DB_PORT = process.env.PORT;
+	const DB_USER = process.env.DB_USER;
+	const DB_PASSWORD = process.env.DB_PASSWORD;
+	const GRAPHILE_LICENSE = process.env.GRAPHILE_LICENSE;
 	
 	const pool = new Pool({
 		host: DB_HOST,
