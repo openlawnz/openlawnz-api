@@ -23,7 +23,8 @@ async function setup(event, context) {
 		port: DB_PORT,
 		database: stage,
 		user: DB_USER,
-		password: DB_PASSWORD
+		password: DB_PASSWORD,
+		ssl: true
 	});
 
 	app.use(awsServerlessExpressMiddleware.eventContext());
