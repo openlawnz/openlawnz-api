@@ -35,7 +35,7 @@ async function setup(event, context) {
 		license: GRAPHILE_LICENSE,
 		pluginHook,
 		enableCors: true,
-		graphiql: stage === "dev",
+		graphiql: true,
 		enhanceGraphiql: true,
 		graphqlRoute: '/graphql',
 		//readOnlyConnection: true,
